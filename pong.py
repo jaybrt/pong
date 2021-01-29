@@ -13,6 +13,16 @@ def new_round(ballrect, bx, by):
     speed = [random.randint(1,5), random.randint(1,5)]
     pygame.time.delay(100)
 
+def make_text(message, position, color = (0,0,0), font_size = 32):
+
+    font = pygame.font.Font('freesansbold.ttf', font_size)
+    text = font.render(str(message), True, color)
+    text_rect = text.get_rect()
+    text_rect.center = (position)
+    return text, text_rect
+
+
+
 def button(button_x, button_y, button_width, button_height, color_active, color_inactive, msg, action = None):
 
     #rectangle for button and the text that goes on it
@@ -37,14 +47,12 @@ def button(button_x, button_y, button_width, button_height, color_active, color_
 def menu_loop():
 
     #where is the button
-    button_width, button_height = width//5, height//10
-    button_x, button_y = width//2-button_width//2, height//2-button_height//2
+    button_width, button_height = width//5+10, height//10
+    button_x, button_y = width//4-button_width//2, height//2-button_height//2
+    button2_x, button2_y = width-width//4-button_width//2, height//2-button_height//2
 
     #text in menu
-    large_font = pygame.font.Font('freesansbold.ttf', 86)
-    text = large_font.render('PyPong', True, (225, 225, 225))
-    text_rect = text.get_rect()
-    text_rect.center = (width//2, height//4)
+    text, text_rect = make_text('PyPong', (width//2, height//4), (255, 255, 255), 86)
 
     menu = True
     while menu:
@@ -56,12 +64,15 @@ def menu_loop():
                 pygame.quit()
                 sys.exit()
 
-        button(button_x, button_y, button_width, button_height, (255,255,255), (192,192,192), 'Two Player', 'game_loop()')
+        button(button_x, button_y, button_width, button_height, (255,255,255), (192,192,192), 'Two Player', 'game_loop(False)')
+        button(button2_x, button2_y, button_width, button_height, (255,255,255), (192,192,192), 'Vs. Computer', 'game_loop(True)')
         win.blit(text, text_rect)
         pygame.display.flip()
 
 
-def game_loop():
+
+
+def game_loop(computer):
 
     rwidth = 10
     rheight = int(.15*height)
@@ -99,13 +110,21 @@ def game_loop():
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w]:
-            if y1>0:
-                y1 -= pspeed
+        if not computer:
+            if keys[pygame.K_w]:
+                if y1>0:
+                    y1 -= pspeed
 
-        if keys[pygame.K_s]:
-            if y1<height-rheight:
-                y1 += pspeed
+            if keys[pygame.K_s]:
+                if y1<height-rheight:
+                    y1 += pspeed
+        else:
+            if ballrect.bottom > y1 + rheight//2:
+                if y1<height-rheight:
+                    y1 += pspeed//3
+            elif ballrect.top < y1 + rheight//2:
+                if y1>0:
+                    y1 -= pspeed//3
 
         if keys[pygame.K_UP]:
             if y2>0:
