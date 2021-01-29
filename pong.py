@@ -12,6 +12,7 @@ def new_round(ballrect, bx, by):
     ballrect.left, ballrect.top = bx, by
     speed = [random.randint(1,5), random.randint(1,5)]
     pygame.time.delay(100)
+    return speed
 
 def make_text(message, position, color = (0,0,0), font_size = 32):
 
@@ -90,6 +91,7 @@ def game_loop(computer):
     by = height/2-5/2
 
     speed = [random.randint(1,5), random.randint(1,5)]
+    collisions = 0
     pspeed = 12
 
     rpoints = 0
@@ -110,6 +112,7 @@ def game_loop(computer):
 
         keys = pygame.key.get_pressed()
 
+        # if playing vs computer then dont accept kb input for left paddle
         if not computer:
             if keys[pygame.K_w]:
                 if y1>0:
@@ -126,6 +129,7 @@ def game_loop(computer):
                 if y1>0:
                     y1 -= pspeed//3
 
+        #input for right paddle
         if keys[pygame.K_UP]:
             if y2>0:
                 y2 -= pspeed
@@ -138,6 +142,10 @@ def game_loop(computer):
 
         ballrect = ballrect.move(speed)
 
+        #speed the ball up after it has hit the paddle 3 times
+        if collisions % 3 == 0 and collisions != 0:
+            collisions = 0
+            speed[0] -= 1
 
         #check if the ball hit either of the paddles or went off the edge and change its velocity accordingly
 
@@ -151,13 +159,15 @@ def game_loop(computer):
         if ballrect.right >= x2:
             if ballrect.top >= y2 and ballrect.bottom <= y2+rheight:
                 speed[0] = -speed[0]
+                #count the number of times the ball has hit the paddle in order to speed it up after 3 hits
+                collisions += 1
 
         if ballrect.right <= 0:
-            new_round(ballrect, bx, by)
+            speed = new_round(ballrect, bx, by)
             rpoints += 1
 
         if ballrect.left >= width:
-            new_round(ballrect, bx, by)
+            speed = new_round(ballrect, bx, by)
             lpoints += 1
 
         #draw everything
