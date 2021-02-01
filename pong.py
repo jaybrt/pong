@@ -1,4 +1,4 @@
-import sys, pygame, random
+import sys, pygame, random, time
 pygame.init()
 
 pygame.display.set_caption('¡Pong!')
@@ -170,6 +170,19 @@ def game_loop(computer):
             speed = new_round(ballrect, bx, by)
             lpoints += 1
 
+        if lpoints > 4 or rpoints > 4:
+            winner = lambda ls, rs: 1 if ls > rs else 2
+            winning_player = winner(lpoints, rpoints)
+            end_text, end_text_rect = make_text(f'Player {winning_player} wins!', (width//2, height//2), (255,255,255), 32)
+            win.blit(end_text, end_text_rect)
+            pygame.display.flip()
+            time.sleep(3)
+            run = False
+
+        #text for scores
+        lscore_text, lscore_text_rect = make_text(str(lpoints), (50,50), (255,255,255))
+        rscore_text, rscore_text_rect = make_text(str(rpoints), (width-50,50), (255,255,255))
+
         #draw everything
 
         win.fill((0,0,0))
@@ -179,6 +192,8 @@ def game_loop(computer):
         pygame.draw.rect(win, (255,255,255), (x1, y1, rwidth, rheight))
         pygame.draw.rect(win, (255,255,255), (x2, y2, rwidth, rheight))
         pygame.draw.rect(win, (255,255,255), ballrect)
+        win.blit(lscore_text, lscore_text_rect)
+        win.blit(rscore_text, rscore_text_rect)
 
         pygame.display.flip()
 
